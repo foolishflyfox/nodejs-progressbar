@@ -14,14 +14,24 @@ app.engine('.bliss', function(path, options, fn){
  * ROUTES
  */
 
-app.get('/:progress?', function(req, res){
-    if ( !req.params.progress || req.params.progress > 100 )
-    {
-        res.send('You must provide a number between 1-100');  
+app.get('/:progress/:total?', function(req, res){
+	progress = req.params.progress;
+	total = req.params.total;
+	if(!progress){
+		progress = "0";
+	}
+	if(!total){
+		total = "100";
+	}
+	progress = parseInt(progress);
+	total = parseInt(total);
+    if ( progress > total ){
+        res.send('You progress is greater than total');  
     }
     else
     {
-        progress = req.params.progress;
+		progress = 100*progress/total;
+		progress = progress.toFixed(2);
         width = 90.0 * progress / 100.0;
         if ( progress < 30 )
         {
@@ -37,7 +47,7 @@ app.get('/:progress?', function(req, res){
 
         res.type('svg');
         res.render('bar.bliss', { width: width, progress: progress, colour: colour  });
-        console.log('Rendered: '.green + progress.green + "%".green);
+        console.log('Rendered: '.green + progress + "%".green);
     }
 });
 
